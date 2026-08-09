@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>📋 Attendance Tracker</h1>
+                <p>Stay on top of your classes</p>
+            </div>
+            <div class="sidebar-user" id="sidebarUser" style="display: none; padding: 12px; background: rgba(255,255,255,0.08); border-radius: 10px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5rem;">👤</span>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="sidebarUsername"></div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="sidebarEmail"></div>
+                    </div>
+                    <a href="../profile/profile.html" class="btn-icon" title="Profile" style="padding: 6px 8px; background: rgba(255,255,255,0.14);">⚙️</a>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="nav-link active" href="index.html">🏠 Dashboard</a>
+                <a class="nav-link" href="../subjects/subjects.html">📚 Subjects</a>
+                <a class="nav-link" href="../attendance/attendance.html">📅 Attendance</a>
+                <a class="nav-link" href="../analytics/analytics.html">📈 Analytics</a>
+                <a class="nav-link" href="../ai-assistant/ai-assistant.html">🤖 AI Assistant</a>
+                <a class="nav-link" href="../profile/profile.html">👤 Profile</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <p class="eyebrow">Overview</p>
+                    <h2>Dashboard</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <a href="../profile/profile.html" class="btn-icon" title="Profile" style="position: relative;">
+                        👤
+                        <span id="profileBadge" style="position: absolute; top: -4px; right: -4px; background: var(--danger); color: white; font-size: 0.65rem; font-weight: 700; min-width: 16px; height: 16px; border-radius: 999px; display: flex; align-items: center; justify-content: center; padding: 0 4px; display: none;"></span>
+                    </a>
+                    <button id="refreshBtn" class="btn-icon" type="button">↻ Refresh</button>
+                </div>
+            </header>
+
+            <section class="hero-card">
+                <div>
+                    <h3>Welcome back</h3>
+                    <p>Your attendance summary is ready. Use the quick links to add subjects, log attendance, or check analytics.</p>
+                </div>
+                <div class="hero-actions">
+                    <a class="btn-primary" href="../attendance/attendance.html">Mark Attendance</a>
+                    <a class="btn-secondary" href="../subjects/subjects.html">Add Subject</a>
+                </div>
+            </section>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="overallPercentage">--%</div>
+                        <div class="stat-label">Overall Attendance</div>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalPresent">--</div>
+                        <div class="stat-label">Total Present</div>
+                    </div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalAbsent">--</div>
+                        <div class="stat-label">Total Absent</div>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalSubjects">--</div>
+                        <div class="stat-label">Subjects</div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="content-panel">
+                <div class="section-header">
+                    <h3>Subject Overview</h3>
+                </div>
+                <div class="subjects-grid" id="dashboardSubjectsGrid">
+                    <div class="empty-state">Loading...</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="dashboard.js"></script>
+</body>
+</html>

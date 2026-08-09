@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant</title>
+    <link rel="stylesheet" href="ai-assistant.css">
+</head>
+
+<body>
+    <div class="page-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>📋 Attendance Tracker</h1>
+                <p>AI Assistant</p>
+            </div>
+            <div class="sidebar-user" id="sidebarUser"
+                style="display: none; padding: 12px; background: rgba(255,255,255,0.08); border-radius: 10px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5rem;">👤</span>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                            id="sidebarUsername"></div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                            id="sidebarEmail"></div>
+                    </div>
+                    <a href="../profile/profile.html" class="btn-icon" title="Profile"
+                        style="padding: 6px 8px; background: rgba(255,255,255,0.14);">⚙️</a>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="../dashboard/index.html">🏠 Dashboard</a>
+                <a class="nav-item" href="../subjects/subjects.html">📚 Subjects</a>
+                <a class="nav-item" href="../attendance/attendance.html">📅 Attendance</a>
+                <a class="nav-item" href="../analytics/analytics.html">📈 Analytics</a>
+                <a class="nav-item active" href="ai-assistant.html">🤖 AI Assistant</a>
+                <a class="nav-item" href="../profile/profile.html">👤 Profile</a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="section-header">
+                <h2>AI Assistant</h2>
+            </div>
+            <div class="card">
+                <div class="chat-box" id="chatBox">
+                    <div class="message ai">
+                        Hello! Ask me about your attendance.
+                    </div>
+                </div>
+
+                <div class="chat-input">
+                    <input id="message" type="text" placeholder="Ask about your attendance...">
+                    <button id="sendBtn" class="btn-primary">Send</button>
+                </div>
+            </div>
+        </main>
+
+        <script type="module" src="ai-assistant.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#f5f6fa;
+}
+
+.container{
+    max-width:700px;
+    margin:40px auto;
+    padding:20px;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:30px;
+    color:#333;
+}
+
+.card{
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    margin-bottom:25px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+.card h2{
+    margin-bottom:20px;
+    color:#333;
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
+    color:#444;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:15px;
+    outline:none;
+}
+
+input:focus{
+    border-color:#2563eb;
+}
+
+.btn{
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+    color:#fff;
+    transition:.3s;
+}
+
+.primary{
+    background:#2563eb;
+}
+
+.primary:hover{
+    background:#1d4ed8;
+}
+
+.warning{
+    background:#f59e0b;
+}
+
+.warning:hover{
+    background:#d97706;
+}
+
+.danger{
+    background:#dc2626;
+}
+
+.danger:hover{
+    background:#b91c1c;
+}
+
+.danger-card{
+    border-left:6px solid #dc2626;
+}
+
+.danger-card p{
+    margin-bottom:20px;
+    color:#555;
+}
+
+@media(max-width:768px){
+
+.container{
+    margin:20px;
+    padding:0;
+}
+
+.card{
+    padding:20px;
+}
+
+}

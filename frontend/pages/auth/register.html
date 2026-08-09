@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Attendance Tracker</title>
+    <link rel="stylesheet" href="register.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">📋</div>
+                <h1>Create Account</h1>
+                <p>Register to start tracking attendance securely</p>
+            </div>
+
+            <form id="registerForm" class="auth-form" novalidate>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required autocomplete="username" placeholder="yourusername">
+                    <span class="error-message" id="usernameError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+                    <span class="error-message" id="emailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="••••••••">
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full" id="submitBtn">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loader hidden">⏳</span>
+                </button>
+
+                <div class="error-banner hidden" id="formError"></div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="login.html">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="register.js"></script>
+</body>
+</html>

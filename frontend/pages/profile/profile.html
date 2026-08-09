@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+    <div class="page-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+            </div>
+            <div class="sidebar-user" id="sidebarUser" style="display: none; padding: 12px; background: rgba(255,255,255,0.08); border-radius: 10px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5rem;">👤</span>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="sidebarUsername"></div>
+                        <div style="font-size: 0.75rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="sidebarEmail"></div>
+                    </div>
+                    <a href="../profile/profile.html" class="btn-icon" title="Profile" style="padding: 6px 8px; background: rgba(255,255,255,0.14);">⚙️</a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="container">
+
+                <h1>👤 My Profile</h1>
+
+                <div class="card">
+
+                    <h2>Profile Information</h2>
+
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="username">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email">
+                    </div>
+
+                    <button id="updateBtn" class="btn primary">
+                        Update Profile
+                    </button>
+
+                </div>
+
+                <div class="card">
+
+                    <h2>Change Password</h2>
+
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" id="currentPassword">
+                    </div>
+
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="newPassword">
+                    </div>
+
+                    <button id="passwordBtn" class="btn warning">
+                        Change Password
+                    </button>
+
+                </div>
+
+                <div class="card danger-card">
+
+                    <h2>Danger Zone</h2>
+
+                    <p>
+                        Deleting your account will permanently remove all your
+                        subjects, attendance records and profile.
+                    </p>
+
+                    <button id="deleteBtn" class="btn danger">
+                        Delete Account
+                    </button>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="profile.js"></script>
+
+</body>
+</html>
