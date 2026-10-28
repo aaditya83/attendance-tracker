@@ -3,6 +3,7 @@ from bson import ObjectId
 from database import subjects_collection
 from depend import get_current_user
 from attservice import calculate_attendance
+from redis_client import get_data, set_data
 
 router = APIRouter(
     prefix="/analytics",
@@ -15,7 +16,10 @@ def analytics(
     current_user=Depends(get_current_user)
 ):
     user_id = str(current_user["_id"])
-
+    ckey = f"analytics:{user_id}:{subject_id}"
+    cdata=get_data(ckey)
+    if cdata is not None:
+        return cdata
     if subject_id == "all":
 
         results = []
@@ -33,10 +37,14 @@ def analytics(
 
             results.append(result)
 
-        return {
+        rest= {
             "type": "all",
             "subjects": results
         }
+        
+        set_data(ckey,rest)
+        
+        return rest
 
     if not ObjectId.is_valid(subject_id):
         raise HTTPException(
@@ -59,9 +67,12 @@ def analytics(
         subject_id,
         current_user
     )
-
-    return {
+    
+    res= {
         "type": "subject",
         "data": result
     }
-
+    
+    set_data(ckey,res)
+    
+    return res

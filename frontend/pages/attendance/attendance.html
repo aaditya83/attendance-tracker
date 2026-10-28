@@ -43,6 +43,15 @@
             <div class="section-header">
                 <h2>Attendance</h2>
             </div>
+            <div class="excel-actions">
+                <button id="downloadExcelBtn" class="btn-secondary" type="button">Download Excel</button>
+                <button id="templateExcelBtn" class="btn-secondary" type="button">Template</button>
+                <label class="btn-secondary upload-btn" for="excelFileInput">
+                    Upload Excel
+                    <input type="file" id="excelFileInput" accept=".xlsx" hidden>
+                </label>
+            </div>
+            <p id="excelStatus" class="excel-status" aria-live="polite"></p>
             <div class="card">
                 <div class="form-group">
                     <label for="attendanceSubject">Subject</label>

@@ -11,6 +11,7 @@ from timeroute import router as timetable_router
 from authroute import router as auth_router
 from profroute import router as prof_router
 from airoute import router as ai_router
+from exroute import router as excel_router
 
 app = FastAPI()
 
@@ -22,6 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(excel_router)
 app.include_router(subjects_router)
 app.include_router(attendance_router)
 app.include_router(analytics_router)

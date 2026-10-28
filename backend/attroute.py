@@ -3,6 +3,7 @@ from bson import ObjectId
 from models import attendance
 from database import attendance_collection, subjects_collection
 from depend import get_current_user
+from redis_client import invalidate_cache
 
 router = APIRouter(prefix="/attendance", tags=["attendance"])
 
@@ -20,7 +21,6 @@ def add_attendance(
     current_user=Depends(get_current_user)
 ):
     user_id = str(current_user["_id"])
-
     subject = subjects_collection.find_one({
         "_id": ObjectId(payload.subject_id),
         "user_id": user_id
@@ -62,7 +62,8 @@ def add_attendance(
     record = attendance_collection.find_one({
         "_id": result.inserted_id
     })
-
+    
+    invalidate_cache(user_id,payload.subject_id)
     return attendance_helper(record)
 
 @router.get("/")
@@ -152,8 +153,8 @@ def update_attendance(
         "_id": ObjectId(attendance_id)
     })
 
+    invalidate_cache(user_id, payload.subject_id)
     return attendance_helper(record)
-
 
 @router.delete("/{attendance_id}")
 def delete_attendance(
@@ -168,6 +169,17 @@ def delete_attendance(
             detail="Invalid attendance ID"
         )
 
+    record = attendance_collection.find_one({
+        "_id": ObjectId(attendance_id),
+        "user_id": user_id
+    })
+
+    if not record:
+        raise HTTPException(
+            status_code=404,
+            detail="Attendance record not found"
+        )
+
     result = attendance_collection.delete_one({
         "_id": ObjectId(attendance_id),
         "user_id": user_id
@@ -179,7 +191,8 @@ def delete_attendance(
             detail="Attendance record not found"
         )
 
+    invalidate_cache(user_id, record["subject_id"])
+
     return {
         "message": "Attendance record deleted successfully"
     }
-

@@ -41,7 +41,7 @@ def update_subject(subject_id: str, subject: Subject, current_user = Depends(get
     updated_subject = subjects_collection.update_one(
         {"_id": ObjectId(subject_id), "user_id": str(current_user["_id"])}, {"$set": subject.dict()})
     if updated_subject.matched_count == 1:
-        return subject_helper(subjects_collection.find_one({"_id": ObjectId(subject_id)}))
+            return subject_helper(subjects_collection.find_one({"_id": ObjectId(subject_id)}))
     return {"error": "Subject not found"}
 
 @router.delete("/{subject_id}")

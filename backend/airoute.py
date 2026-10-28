@@ -16,6 +16,59 @@ client = InferenceClient(
 class AIRequest(BaseModel):
     message: str
 
+def get_attendance_summary(user_id, subject_id=None):
+
+    query = {
+        "user_id": user_id
+    }
+
+    if subject_id:
+        query["subject_id"] = subject_id
+
+    records = list(
+        attendance_collection.find(query)
+    )
+
+    total = len(records)
+
+    present = sum(
+        1
+        for record in records
+        if record["status"].lower() == "present"
+    )
+
+    absent = total - present
+
+    percentage = (
+        (present / total) * 100
+        if total > 0
+        else 0
+    )
+
+    return {
+        "present": present,
+        "absent": absent,
+        "total": total,
+        "percentage": round(percentage, 2)
+    }
+
+def extract_required_percentage(message):
+    patterns = [
+        r"(?:maintain|keep|reach|at least)\s+(\d+(?:\.\d+)?)\s*%",
+        r"(\d+(?:\.\d+)?)\s*%\s*(?:attendance|minimum)"
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, message, re.IGNORECASE)
+
+        if match:
+            percentage = float(match.group(1))
+
+            if 0 < percentage <= 100:
+                return percentage
+
+    return 75.0
+
 def find_subject_from_message(user_id, message):
     subjects = subjects_collection.find({
         "user_id": user_id
@@ -256,8 +309,11 @@ def calculate_attendance(user_id):
     }
 
 
-def calculate_bunk(user_id, subject_id, bunk_count):
-
+def calculate_bunk(
+    user_id,
+    subject_id,
+    required_percentage=75
+):
     records = list(attendance_collection.find({
         "user_id": user_id,
         "subject_id": subject_id
@@ -279,18 +335,26 @@ def calculate_bunk(user_id, subject_id, bunk_count):
 
     current_percentage = (present / total) * 100
 
-    new_total = total + bunk_count
-    new_percentage = (present / new_total) * 100
+    max_bunk = 0
+
+    while (
+        present / (total + max_bunk + 1) * 100
+        >= required_percentage
+    ):
+        max_bunk += 1
+
+    final_percentage = (
+        present / (total + max_bunk)
+    ) * 100
 
     return {
         "possible": True,
-        "current_present": present,
-        "current_total": total,
+        "present": present,
+        "total": total,
         "current_percentage": round(current_percentage, 2),
-        "bunk_count": bunk_count,
-        "new_present": present,
-        "new_total": new_total,
-        "new_percentage": round(new_percentage, 2)
+        "max_bunk": max_bunk,
+        "required_percentage": required_percentage,
+        "final_percentage": round(final_percentage, 2)
     }
 
 
@@ -327,6 +391,7 @@ def mark_attendance(user_id, subject_name, status):
                 }
             }
         )
+        invalidate_user_analytics(user_id)
 
         return {
             "success": True,
@@ -342,6 +407,7 @@ def mark_attendance(user_id, subject_name, status):
         "date": today,
         "status": status
     })
+    invalidate_user_analytics(user_id)
 
     return {
         "success": True,
@@ -405,9 +471,14 @@ def chat(
                     )
                 }
 
-            result = calculate_safe_bunk(
+            required_percentage = extract_required_percentage(
+                lower_message
+            )
+
+            result = calculate_bunk(
                 user_id,
-                str(subject["_id"])
+                str(subject["_id"]),
+                required_percentage
             )
 
             if not result["possible"]:
@@ -521,31 +592,41 @@ def chat(
         # QUERY PROCESS
         if (
             "attendance" in lower_message
-            and not (
-                "how many" in lower_message
-                and (
-                    "bunk" in lower_message
-                    or "miss" in lower_message
-                    or "skip" in lower_message
-                )
+            and (
+                "what is" in lower_message
+                or "show" in lower_message
+                or "tell me" in lower_message
+                or "my attendance" in lower_message
             )
         ):
-            subject = find_subject_from_message(user_id,
+            subject = find_subject_from_message(
+                user_id,
                 lower_message
             )
 
             if subject:
-                result = get_subject_attendance(
+                result = get_attendance_summary(
                     user_id,
                     str(subject["_id"])
                 )
 
+                return {
+                    "reply": (
+                        f"{subject['name']} Attendance\n\n"
+                        f"Present: {result['present']}\n"
+                        f"Absent: {result['absent']}\n"
+                        f"Total Classes: {result['total']}\n"
+                        f"Attendance: {result['percentage']}%"
+                    )
+                }
+            result = get_attendance_summary(user_id)
+
             return {
                 "reply": (
-                    f"{subject['name']} Attendance\n\n"
+                    "Overall Attendance\n\n"
                     f"Present: {result['present']}\n"
                     f"Absent: {result['absent']}\n"
-                    f"Total classes: {result['total']}\n"
+                    f"Total Classes: {result['total']}\n"
                     f"Attendance: {result['percentage']}%"
                 )
             }
@@ -584,4 +665,3 @@ def chat(
             status_code=500,
             detail=str(e)
         )
-

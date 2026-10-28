@@ -4,8 +4,19 @@ const attendanceSubjectSelect = document.getElementById("attendanceSubject");
 const attendanceDateInput = document.getElementById("attendanceDate");
 const markAttendanceBtn = document.getElementById("markAttendanceBtn");
 const attendanceTableBody = document.getElementById("attendanceTableBody");
+const downloadExcelBtn = document.getElementById("downloadExcelBtn");
+const templateExcelBtn = document.getElementById("templateExcelBtn");
+const excelFileInput = document.getElementById("excelFileInput");
+const excelStatus = document.getElementById("excelStatus");
 
 let subjects = [];
+
+function setExcelStatus(message, type = "info") {
+    if (!excelStatus) return;
+
+    excelStatus.textContent = message;
+    excelStatus.className = `excel-status ${type}`;
+}
 
 
 async function loadSubjects() {
@@ -227,9 +238,146 @@ markAttendanceBtn.addEventListener(
 );
 
 
+async function downloadExcel() {
+    setExcelStatus("Preparing Excel download...");
+
+    try {
+        const response = await authFetch("/excel/download");
+
+        if (!response) return;
+
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.detail || `HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "attendance.xlsx";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+        setExcelStatus("Excel file downloaded successfully.", "success");
+
+    } catch (error) {
+        console.error("Failed to download Excel:", error);
+        setExcelStatus(error.message, "error");
+        alert(error.message);
+    }
+}
+
+async function downloadTemplateExcel() {
+    setExcelStatus("Preparing Excel template...");
+
+    try {
+        const response = await authFetch("/excel/template");
+
+        if (!response) return;
+
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.detail || `HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "attendance_template.xlsx";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+        setExcelStatus("Excel template downloaded successfully.", "success");
+
+    } catch (error) {
+        console.error("Failed to download Excel template:", error);
+        setExcelStatus(error.message, "error");
+        alert(error.message);
+    }
+}
+
+async function uploadExcel(event) {
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".xlsx")) {
+        setExcelStatus("Please choose an .xlsx file.", "error");
+        event.target.value = "";
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setExcelStatus("Uploading Excel file...");
+
+    try {
+        const response = await authFetch("/excel/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response) return;
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail ||
+                data.error ||
+                `HTTP error! status: ${response.status}`
+            );
+        }
+
+        const summary = [
+            `Imported: ${data.imported ?? 0}`,
+            `Skipped: ${data.skipped ?? 0}`
+        ];
+
+        if (data.errors?.length) {
+            summary.push("", "Errors:");
+            summary.push(...data.errors.map(error => `• ${error}`));
+        }
+
+        setExcelStatus(
+            summary.join("\n"),
+            data.errors?.length ? "error" : "success"
+        );
+
+        event.target.value = "";
+        await loadAttendance();
+
+    } catch (error) {
+        console.error("Failed to upload Excel:", error);
+        setExcelStatus(error.message, "error");
+        alert(error.message);
+    }
+}
+
 async function initialize() {
     await loadSubjects();
     await loadAttendance();
+}
+
+if (downloadExcelBtn) {
+    downloadExcelBtn.addEventListener("click", downloadExcel);
+}
+
+if (templateExcelBtn) {
+    templateExcelBtn.addEventListener("click", downloadTemplateExcel);
+}
+
+if (excelFileInput) {
+    excelFileInput.addEventListener("change", uploadExcel);
 }
 
 initialize();
