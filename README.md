@@ -1,134 +1,176 @@
 # Attendance Tracker
 
-A FastAPI-based attendance tracking system with AI-powered chat assistance for college students.
+Attendance Tracker is a full-stack attendance management application built with FastAPI and MongoDB. It provides subject and timetable management, attendance records, analytics, Excel import/export, profile management, and an AI-assisted chat interface.
 
 ## Features
 
-- **Subject Management**: Add, view, update, delete subjects with custom attendance requirements
-- **Attendance Tracking**: Mark present/absent, view statistics per subject
-- **Analytics**: Calculate attendance percentage, safe bunk count, classes needed to meet requirements
-- **Timetable**: Manage class schedules by day and time
-- **User Authentication**: JWT-based auth with secure password hashing
-- **AI Assistant**: Natural language queries for attendance (e.g., "How many DBMS classes can I bunk?")
+- JWT authentication with account registration and login
+- Subject management with configurable attendance thresholds
+- Attendance entry management and historical records
+- Dashboard and per-subject attendance analytics
+- Safe-bunk and required-class calculations
+- Daily timetable management
+- Excel template download, attendance export, and bulk import
+- Profile updates, password changes, and account deletion
+- AI chat for attendance summaries and common planning questions
+- Responsive static frontend served directly by FastAPI
 
 ## Tech Stack
 
-- **Backend**: FastAPI, Python 3.10+
-- **Database**: MongoDB (via PyMongo)
-- **Auth**: JWT (python-jose), Password hashing (pwdlib)
-- **AI**: Hugging Face Inference API
-- **Frontend**: Static HTML/CSS/JS (served via FastAPI)
+- **Backend:** FastAPI, Pydantic
+- **Database:** MongoDB through PyMongo
+- **Caching:** Redis
+- **Authentication:** JWT and password hashing
+- **AI:** Hugging Face Inference API
+- **Excel:** openpyxl
+- **Frontend:** HTML, CSS, and JavaScript
 
-## Project Structure
+## Requirements
 
-```
-pr/
-├── backend/
-│   ├── main.py              # FastAPI app entry point
-│   ├── database.py          # MongoDB connection
-│   ├── models.py            # Pydantic models
-│   ├── security.py          # Password hashing & JWT
-│   ├── depend.py            # Auth dependencies
-│   ├── authroute.py         # Auth endpoints
-│   ├── subroute.py          # Subject endpoints
-│   ├── attroute.py          # Attendance endpoints
-│   ├── anroute.py           # Analytics endpoints
-│   ├── dashroute.py         # Dashboard endpoints
-│   ├── timeroute.py         # Timetable endpoints
-│   ├── profroute.py         # Professor endpoints
-│   ├── airoute.py           # AI chat endpoints
-│   └── attservice.py        # Attendance calculations
-├── frontend/                # Static files (HTML/CSS/JS)
-├── requirements.txt
-└── .env                     # Environment variables (not committed)
-```
+- Python 3.10 or later
+- MongoDB
+- Redis
+- A Hugging Face API token for AI chat
 
-## Setup
+> Redis is used for analytics caching and must be running at `localhost:6379` for analytics routes to work. The AI token is optional for non-AI features.
 
-### Prerequisites
+## Getting Started
 
-- Python 3.10+
-- MongoDB (local or Atlas)
-- Hugging Face API token (for AI features)
-
-### Installation
+### 1. Clone and create a virtual environment
 
 ```bash
-# Clone and navigate
-cd pr
-
-# Create virtual environment
+git clone https://github.com/aaditya83/attendance-tracker.git
+cd attendance-tracker
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Install dependencies
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+```
+
+### 2. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### Environment Variables
+The current requirements cover the core application; ensure `openpyxl` and `redis` are installed if they are not already present:
+
+```bash
+pip install openpyxl redis
+```
+
+### 3. Configure environment variables
 
 Create a `.env` file in `backend/`:
 
 ```env
 MONGO_URI=mongodb://localhost:27017
 DATABASE_NAME=attendance_tracker
-SECRET_KEY=your-secret-key-here
-api=your-huggingface-api-token
+SECRET_KEY=replace-with-a-long-random-secret
+api=replace-with-your-huggingface-token
 ```
 
-### Run the Server
+Generate a suitable JWT secret locally with:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+### 4. Start Redis and MongoDB
+
+Start MongoDB and Redis using your local installation or hosted service. For a local Redis instance on Windows, macOS, or Linux, ensure it accepts connections on `localhost:6379`.
+
+### 5. Run the application
 
 ```bash
 cd backend
 uvicorn main:app --reload --port 8000
 ```
 
-Server runs at `http://localhost:8000`
+Open:
 
-API docs at `http://localhost:8000/docs`
+- Application: http://localhost:8000
+- API documentation: http://localhost:8000/docs
+- Alternative API schema: http://localhost:8000/redoc
 
-## API Endpoints
+## Project Structure
 
-### Auth
-- `POST /auth/register` - Register new user
-- `POST /auth/login` - Login, returns JWT
-- `GET /auth/me` - Get current user profile
+```text
+attendance-tracker/
+├── backend/
+│   ├── main.py           # FastAPI application and static frontend mount
+│   ├── database.py       # MongoDB collections
+│   ├── models.py         # Request and response schemas
+│   ├── security.py       # Password hashing and JWT signing
+│   ├── depend.py         # Authentication dependencies
+│   ├── authroute.py      # Registration and login
+│   ├── subroute.py       # Subject CRUD
+│   ├── attroute.py       # Attendance CRUD
+│   ├── anroute.py        # Attendance analytics and cache
+│   ├── dashroute.py      # Dashboard summary
+│   ├── timeroute.py      # Timetable CRUD
+│   ├── profroute.py      # Profile management
+│   ├── airoute.py        # AI chat
+│   ├── exroute.py        # Excel template, upload, and download
+│   ├── attservice.py     # Attendance calculations
+│   └── redis_client.py   # Redis cache helpers
+├── frontend/
+│   ├── js/               # Shared authentication and route guard
+│   └── pages/            # Login, register, dashboard, and feature pages
+├── requirements.txt
+└── .env                  # Local secrets, not committed
+```
 
-### Subjects
-- `POST /subjects/` - Create subject
-- `GET /subjects/` - List all subjects
-- `GET /subjects/{id}` - Get subject
-- `PUT /subjects/{id}` - Update subject
-- `DELETE /subjects/{id}` - Delete subject
+## API Overview
 
-### Attendance
-- `POST /attendance/` - Mark attendance
-- `GET /attendance/{subject_id}` - Get attendance records
-- `PUT /attendance/{id}` - Update attendance
-- `DELETE /attendance/{id}` - Delete attendance
+Protected endpoints require a bearer token returned by `POST /auth/login`.
 
-### Analytics
-- `GET /analytics/{subject_id}` - Attendance stats & predictions
-- `GET /analytics/` - Overall attendance summary
+| Area | Methods and paths |
+| --- | --- |
+| Authentication | `POST /auth/register`, `POST /auth/login`, `GET /auth/users`, `GET /auth/me` |
+| Profile | `GET /profile/`, `PUT /profile/`, `PUT /profile/password`, `DELETE /profile/` |
+| Subjects | `POST /subjects/`, `GET /subjects/`, `GET /subjects/{subject_id}`, `PUT /subjects/{subject_id}`, `DELETE /subjects/{subject_id}` |
+| Attendance | `POST /attendance/`, `GET /attendance/`, `GET /attendance/{attendance_id}`, `PUT /attendance/{attendance_id}`, `DELETE /attendance/{attendance_id}` |
+| Dashboard | `GET /dashboard/` |
+| Analytics | `GET /analytics/{subject_id}` (use `all` for every subject) |
+| Timetable | `POST /timetable/`, `GET /timetable/`, `GET /timetable/{day}`, `PUT /timetable/{entry_id}`, `DELETE /timetable/{entry_id}` |
+| Excel | `GET /excel/template`, `GET /excel/download`, `POST /excel/upload` |
+| AI assistant | `POST /ai/chat` |
 
-### Timetable
-- `POST /timetable/` - Add timetable entry
-- `GET /timetable/` - Get timetable
-- `DELETE /timetable/{id}` - Delete entry
+FastAPI also exposes the complete interactive schema at `/docs`.
 
-### AI Chat
-- `POST /ai/chat` - Natural language attendance queries
+## Excel Workflow
 
-**Examples:**
+1. Download the template from `GET /excel/template`.
+2. Enter subject names, dates in `YYYY-MM-DD` format, and either `Present` or `Absent`.
+3. Upload the completed `.xlsx` file to `POST /excel/upload`.
+4. Download the user's saved records from `GET /excel/download`.
+
+Upload data is accepted only in `.xlsx` format.
+
+## AI Chat Examples
+
+Send a JSON object to `POST /ai/chat`:
+
+```json
+{
+  "message": "How many DBMS classes can I bunk?"
+}
+```
+
+The assistant can answer attendance questions such as:
+
 - "What is my DBMS attendance?"
-- "How many DBMS classes can I bunk?"
-- "If I bunk 2 IT classes, what happens?"
+- "How many IT classes can I bunk?"
+- "If I bunk 2 classes, what happens?"
 - "Mark me present for today's IoT class"
 
-## Frontend
+## Development Notes
 
-Static files served from `/` route. Access the UI at `http://localhost:8000/pages/auth/login.html`
-
-## License
-
-MIT
+- Run commands from the repository root unless a command explicitly changes directory.
+- Environment variables are loaded from `.env`; keep secrets out of version control.
+- Backend static paths assume the server is started from `backend/` (`uvicorn main:app`) so `../frontend` resolves correctly.
+- Automated tests are not currently included in the repository.
